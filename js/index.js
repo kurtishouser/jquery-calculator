@@ -24,12 +24,17 @@ $(function() {
 
         output = output.replace(/x/g, '*');
         output = output.replace(/÷/g, '/');
-        output = eval(output);
-        $('#screen').html(output);
+        result = eval(output);
+        $('#screen').text(result);
+        output = result.toString();
         evaluated = true;
 
       } else { // other operators
 
+        if (output.endsWith('÷') || output.endsWith('x') ||
+            output.endsWith('-') || output.endsWith('+')) {
+              output = output.slice(0,-1);
+        }
         output += $target.text();
         $('#screen').html(output);
 
