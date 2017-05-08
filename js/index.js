@@ -2,62 +2,98 @@ $(function() {
 
   console.log("JQ Loaded. Let's do some basic math!");
 
-  let output = '';
+  let output = '0';
   let evaluated = false;
+  let evaluationError = false;
+
+  $('#screen').text(output); // initialize display
 
   $('.buttons').children().on('click', function(event) {
 
     var $target = $(event.target);
 
-    console.log('clicked', $target, $target.html(), typeof $target.html(), $target.text());
+    if (evaluationError) {
+      output = '';
+      evaluationError = false;
+    }
 
-    if ($target.hasClass('operator')) { // operator buttons
+    if ($target.hasClass('operator')) { // ÷ x - + = buttons
 
-      console.log('operator');
+      if ($target.is('#clear')) { // C button
 
-      if ($target.is('#clear')) { // C operator
+        evaluated = false;
+        output = '0';
+        // updateDisplay(output);
 
-        output = '';
-        $('#screen').html(output);
+      } else if ($target.is('#equals')) { // = button, evaluate the formula
 
-      } else if ($target.is('#equals')) { // = operator, evaluate the formula
+        // replace with code syntax operators
+        output = output.replace(/x/g, '*').replace(/÷/g, '/');
 
-        output = output.replace(/x/g, '*');
-        output = output.replace(/÷/g, '/');
+        // try {
+        //   output = result.toString();
+        // }
+        // catch (e) {
+        //  console.log(e);
+        // }
+
         result = eval(output);
-        $('#screen').text(result);
-        output = result.toString();
+        if (result === Infinity || isNaN(result)) { // number / 0 or 0 / 0
+          evaluationError = true;
+          output = "Error";
+        } else {
+          output = result.toString();
+        }
         evaluated = true;
+        // updateDisplay(output);
 
-      } else { // other operators
 
+      } else { // ÷ x - + buttons
+
+        evaluated = false; // continue calulation
+
+        // only register last operator
         if (output.endsWith('÷') || output.endsWith('x') ||
             output.endsWith('-') || output.endsWith('+')) {
-              output = output.slice(0,-1);
+          output = output.slice(0, -1);
         }
+         q
         output += $target.text();
-        $('#screen').html(output);
+        // updateDisplay(output);
 
       }
 
-    } else if ($target.is('#zero')) { // zero button
+    } else { // number buttons
 
-      // zero will eventually be handled differently
-      // depending on the contents in the display
-      console.log('zero');
-      output += $target.text();
-      $('#screen').html(output);
+      if ($target.is('#zero')) { // zero button
 
-    } else { // other number buttons
+        if (evaluated || $('#screen').text() === '0') { // ignore multiple zeros
+          output = '0';
+        } else {
+          output += $target.text();
+        }
+        // updateDisplay(output);
 
-      console.log('number');
+      } else { // other number buttons
 
-      output += $target.text();
-      $('#screen').html(output);
+        if (evaluated || $('#screen').text() === '0') {
+          output = $target.text();
+        } else {
+          output += $target.text();
+        }
+        evaluated = false;
+        // updateDisplay(output);
 
+      }
     }
+
+    // update the dislpay
+    $('#screen').text(output);
 
   }); // end click handler
 
+// function updateDisplay(output) {
+//   $('#screen').text(output);
+// }
 
 });
