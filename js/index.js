@@ -2,7 +2,7 @@ $(function() {
 
   console.log("JQ Loaded. Let's do some basic math!");
 
-  let output = '0';
+  let output = '';
   let evaluated = false;
   let evaluationError = false;
 
@@ -12,7 +12,7 @@ $(function() {
 
     var $target = $(event.target);
 
-    if (evaluationError) {
+    if (evaluationError) { // clear display on first button click after eval error
       output = '';
       evaluationError = false;
     }
@@ -22,31 +22,28 @@ $(function() {
       if ($target.is('#clear')) { // C button
 
         evaluated = false;
-        output = '0';
-        // updateDisplay(output);
+        output = '';
 
       } else if ($target.is('#equals')) { // = button, evaluate the formula
 
         // replace with code syntax operators
         output = output.replace(/x/g, '*').replace(/÷/g, '/');
 
-        // try {
-        //   output = result.toString();
-        // }
-        // catch (e) {
-        //  console.log(e);
-        // }
+        try {
+          result = eval(output);
+        }
+        catch (e) {
+         console.log(e);
+         evaluationError = true;
+        }
 
-        result = eval(output);
-        if (result === Infinity || isNaN(result)) { // number / 0 or 0 / 0
+        if (evaluationError || result === Infinity || result === -Infinity || isNaN(result)) { // number / 0 or 0 / 0
           evaluationError = true;
           output = "Error";
         } else {
           output = result.toString();
         }
         evaluated = true;
-        // updateDisplay(output);
-
 
       } else { // ÷ x - + buttons
 
@@ -57,9 +54,8 @@ $(function() {
             output.endsWith('-') || output.endsWith('+')) {
           output = output.slice(0, -1);
         }
-         q
+
         output += $target.text();
-        // updateDisplay(output);
 
       }
 
@@ -72,7 +68,6 @@ $(function() {
         } else {
           output += $target.text();
         }
-        // updateDisplay(output);
 
       } else { // other number buttons
 
@@ -82,7 +77,6 @@ $(function() {
           output += $target.text();
         }
         evaluated = false;
-        // updateDisplay(output);
 
       }
     }
@@ -91,9 +85,5 @@ $(function() {
     $('#screen').text(output);
 
   }); // end click handler
-
-// function updateDisplay(output) {
-//   $('#screen').text(output);
-// }
 
 });
